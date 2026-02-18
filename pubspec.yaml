@@ -1,0 +1,55 @@
+name: flutter_app
+description: "Football stats app — leagues, matches, teams, players."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # HTTP запросы
+  dio: ^5.8.0+1
+
+  # Кэш ответов API (экономим 100 запросов/день)
+  dio_cache_interceptor: ^3.5.0
+
+  # Управление состоянием
+  flutter_riverpod: ^2.6.1
+
+  # Локальная БД для избранного (простое хранилище key-value)
+  shared_preferences: ^2.5.2
+
+  # Изображения (гербы команд) с кэшированием
+  cached_network_image: ^3.4.1
+
+  # Навигация
+  go_router: ^14.8.1
+
+  # Заморозка моделей данных + JSON
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Форматирование дат
+  intl: ^0.20.2
+
+  # Переменные окружения (.env файл)
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Кодогенерация для freezed и json
+  build_runner: ^2.4.14
+  freezed: ^2.5.7
+  json_serializable: ^6.9.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
