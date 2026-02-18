@@ -11,8 +11,8 @@ class Endpoints {
   static String team(int id) => '/teams/$id';
   static String teamMatches(int id) => '/teams/$id/matches';
   // Players
-  static String player(int id) => '/players/$id';
-  static String playerMatches(int id) => '/players/$id/matches';
+  static String player(int id) => '/persons/$id';
+  static String playerMatches(int id) => '/persons/$id/matches';
   // Matches
   static const String todayMatches = '/matches';
   static String match(int id) => '/matches/$id';

@@ -610,7 +610,7 @@ StandingTable _$StandingTableFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StandingTable {
-  String get type => throw _privateConstructorUsedError; // TOTAL, HOME, AWAY
+  String get type => throw _privateConstructorUsedError;
   String? get group => throw _privateConstructorUsedError;
   List<StandingRow> get table => throw _privateConstructorUsedError;
 
@@ -736,7 +736,6 @@ class _$StandingTableImpl implements _StandingTable {
 
   @override
   final String type;
-  // TOTAL, HOME, AWAY
   @override
   final String? group;
   final List<StandingRow> _table;
@@ -796,7 +795,7 @@ abstract class _StandingTable implements StandingTable {
       _$StandingTableImpl.fromJson;
 
   @override
-  String get type; // TOTAL, HOME, AWAY
+  String get type;
   @override
   String? get group;
   @override

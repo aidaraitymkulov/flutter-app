@@ -235,9 +235,7 @@ Score _$ScoreFromJson(Map<String, dynamic> json) {
 mixin _$Score {
   String? get winner =>
       throw _privateConstructorUsedError; // HOME_TEAM, AWAY_TEAM, DRAW
-  @JsonKey(name: 'fullTime')
   HalfScore? get fullTime => throw _privateConstructorUsedError;
-  @JsonKey(name: 'halfTime')
   HalfScore? get halfTime => throw _privateConstructorUsedError;
 
   /// Serializes this Score to a JSON map.
@@ -254,11 +252,7 @@ abstract class $ScoreCopyWith<$Res> {
   factory $ScoreCopyWith(Score value, $Res Function(Score) then) =
       _$ScoreCopyWithImpl<$Res, Score>;
   @useResult
-  $Res call({
-    String? winner,
-    @JsonKey(name: 'fullTime') HalfScore? fullTime,
-    @JsonKey(name: 'halfTime') HalfScore? halfTime,
-  });
+  $Res call({String? winner, HalfScore? fullTime, HalfScore? halfTime});
 
   $HalfScoreCopyWith<$Res>? get fullTime;
   $HalfScoreCopyWith<$Res>? get halfTime;
@@ -339,11 +333,7 @@ abstract class _$$ScoreImplCopyWith<$Res> implements $ScoreCopyWith<$Res> {
   ) = __$$ScoreImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String? winner,
-    @JsonKey(name: 'fullTime') HalfScore? fullTime,
-    @JsonKey(name: 'halfTime') HalfScore? halfTime,
-  });
+  $Res call({String? winner, HalfScore? fullTime, HalfScore? halfTime});
 
   @override
   $HalfScoreCopyWith<$Res>? get fullTime;
@@ -391,11 +381,7 @@ class __$$ScoreImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ScoreImpl implements _Score {
-  const _$ScoreImpl({
-    this.winner,
-    @JsonKey(name: 'fullTime') this.fullTime,
-    @JsonKey(name: 'halfTime') this.halfTime,
-  });
+  const _$ScoreImpl({this.winner, this.fullTime, this.halfTime});
 
   factory _$ScoreImpl.fromJson(Map<String, dynamic> json) =>
       _$$ScoreImplFromJson(json);
@@ -404,10 +390,8 @@ class _$ScoreImpl implements _Score {
   final String? winner;
   // HOME_TEAM, AWAY_TEAM, DRAW
   @override
-  @JsonKey(name: 'fullTime')
   final HalfScore? fullTime;
   @override
-  @JsonKey(name: 'halfTime')
   final HalfScore? halfTime;
 
   @override
@@ -448,8 +432,8 @@ class _$ScoreImpl implements _Score {
 abstract class _Score implements Score {
   const factory _Score({
     final String? winner,
-    @JsonKey(name: 'fullTime') final HalfScore? fullTime,
-    @JsonKey(name: 'halfTime') final HalfScore? halfTime,
+    final HalfScore? fullTime,
+    final HalfScore? halfTime,
   }) = _$ScoreImpl;
 
   factory _Score.fromJson(Map<String, dynamic> json) = _$ScoreImpl.fromJson;
@@ -457,10 +441,8 @@ abstract class _Score implements Score {
   @override
   String? get winner; // HOME_TEAM, AWAY_TEAM, DRAW
   @override
-  @JsonKey(name: 'fullTime')
   HalfScore? get fullTime;
   @override
-  @JsonKey(name: 'halfTime')
   HalfScore? get halfTime;
 
   /// Create a copy of Score

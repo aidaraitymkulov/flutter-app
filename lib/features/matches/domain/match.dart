@@ -20,8 +20,8 @@ class MatchTeam with _$MatchTeam {
 class Score with _$Score {
   const factory Score({
     String? winner, // HOME_TEAM, AWAY_TEAM, DRAW
-    @JsonKey(name: 'fullTime') HalfScore? fullTime,
-    @JsonKey(name: 'halfTime') HalfScore? halfTime,
+    HalfScore? fullTime,
+    HalfScore? halfTime,
   }) = _Score;
 
   factory Score.fromJson(Map<String, dynamic> json) => _$ScoreFromJson(json);
