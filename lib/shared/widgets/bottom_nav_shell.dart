@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/domain/auth_providers.dart';
 
-class BottomNavShell extends StatelessWidget {
+class BottomNavShell extends ConsumerWidget {
   final Widget child;
 
   const BottomNavShell({super.key, required this.child});
@@ -13,9 +15,42 @@ class BottomNavShell extends StatelessWidget {
     return 0;
   }
 
+  Future<void> _logout(BuildContext context, WidgetRef ref) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Выход'),
+        content: const Text('Вы уверены что хотите выйти?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Отмена'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Выйти'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await ref.read(authProvider.notifier).logout();
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Выйти',
+            onPressed: () => _logout(context, ref),
+          ),
+        ],
+      ),
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex(context),

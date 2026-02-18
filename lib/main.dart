@@ -6,18 +6,15 @@ import 'core/router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  runApp(
-    const ProviderScope(
-      child: FootballApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: FootballApp()));
 }
 
-class FootballApp extends StatelessWidget {
+class FootballApp extends ConsumerWidget {
   const FootballApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = createRouter(ref);
     return MaterialApp.router(
       title: 'Football',
       debugShowCheckedModeBanner: false,
@@ -28,7 +25,7 @@ class FootballApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }

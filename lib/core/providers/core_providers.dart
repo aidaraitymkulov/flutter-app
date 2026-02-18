@@ -1,14 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_client.dart';
+import '../../features/auth/data/token_storage.dart';
+import '../../features/auth/data/auth_repository.dart';
 import '../../features/competitions/data/competitions_repository.dart';
 import '../../features/matches/data/matches_repository.dart';
 import '../../features/teams/data/teams_repository.dart';
 import '../../features/players/data/players_repository.dart';
 
-// Единственный экземпляр ApiClient на всё приложение
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
+final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());
 
-// Репозитории — получают ApiClient через ref
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepository(ref.watch(tokenStorageProvider)),
+);
+
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(
+    ref.watch(tokenStorageProvider),
+    ref.watch(authRepositoryProvider),
+  ),
+);
+
 final competitionsRepositoryProvider = Provider<CompetitionsRepository>(
   (ref) => CompetitionsRepository(ref.watch(apiClientProvider)),
 );
