@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/teams/domain/team.dart';
+import 'package:flutter_app/shared/widgets/search_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -77,17 +79,39 @@ class _StandingsTab extends ConsumerWidget {
                       imageUrl: row.team.crest!,
                       width: 24,
                       height: 24,
-                      errorWidget: (context, url, error) => const SizedBox(width: 24),
+                      errorWidget: (context, url, error) =>
+                          const SizedBox(width: 24),
                     )
                   else
                     const SizedBox(width: 24),
                   const SizedBox(width: 8),
                   Expanded(child: Text(row.team.shortName ?? row.team.name)),
-                  SizedBox(width: 28, child: Text('${row.playedGames}', textAlign: TextAlign.center)),
-                  SizedBox(width: 28, child: Text('${row.won}', textAlign: TextAlign.center)),
-                  SizedBox(width: 28, child: Text('${row.draw}', textAlign: TextAlign.center)),
-                  SizedBox(width: 28, child: Text('${row.lost}', textAlign: TextAlign.center)),
-                  SizedBox(width: 36, child: Text('${row.goalDifference}', textAlign: TextAlign.center)),
+                  SizedBox(
+                    width: 28,
+                    child: Text(
+                      '${row.playedGames}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 28,
+                    child: Text('${row.won}', textAlign: TextAlign.center),
+                  ),
+                  SizedBox(
+                    width: 28,
+                    child: Text('${row.draw}', textAlign: TextAlign.center),
+                  ),
+                  SizedBox(
+                    width: 28,
+                    child: Text('${row.lost}', textAlign: TextAlign.center),
+                  ),
+                  SizedBox(
+                    width: 36,
+                    child: Text(
+                      '${row.goalDifference}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                   SizedBox(
                     width: 36,
                     child: Text(
@@ -123,12 +147,30 @@ class _StandingsHeader extends StatelessWidget {
           const SizedBox(width: 24),
           const SizedBox(width: 8),
           const Expanded(child: SizedBox()),
-          SizedBox(width: 28, child: Text('И', textAlign: TextAlign.center, style: style)),
-          SizedBox(width: 28, child: Text('В', textAlign: TextAlign.center, style: style)),
-          SizedBox(width: 28, child: Text('Н', textAlign: TextAlign.center, style: style)),
-          SizedBox(width: 28, child: Text('П', textAlign: TextAlign.center, style: style)),
-          SizedBox(width: 36, child: Text('ГР', textAlign: TextAlign.center, style: style)),
-          SizedBox(width: 36, child: Text('О', textAlign: TextAlign.center, style: style)),
+          SizedBox(
+            width: 28,
+            child: Text('И', textAlign: TextAlign.center, style: style),
+          ),
+          SizedBox(
+            width: 28,
+            child: Text('В', textAlign: TextAlign.center, style: style),
+          ),
+          SizedBox(
+            width: 28,
+            child: Text('Н', textAlign: TextAlign.center, style: style),
+          ),
+          SizedBox(
+            width: 28,
+            child: Text('П', textAlign: TextAlign.center, style: style),
+          ),
+          SizedBox(
+            width: 36,
+            child: Text('ГР', textAlign: TextAlign.center, style: style),
+          ),
+          SizedBox(
+            width: 36,
+            child: Text('О', textAlign: TextAlign.center, style: style),
+          ),
         ],
       ),
     );
@@ -204,51 +246,105 @@ class _TeamsTab extends ConsumerWidget {
     return teamsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Ошибка: $e')),
-      data: (teams) => GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: teams.length,
-        itemBuilder: (context, index) {
-          final team = teams[index];
-          return GestureDetector(
-            onTap: () => context.push(
-              '/team/${team.id}?name=${Uri.encodeComponent(team.name)}',
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (team.crest != null)
-                  CachedNetworkImage(
-                    imageUrl: team.crest!,
-                    width: 56,
-                    height: 56,
-                    errorWidget: (context, url, error) => const Icon(Icons.shield, size: 56),
-                  )
-                else
-                  const Icon(Icons.shield, size: 56),
-                const SizedBox(height: 6),
-                Text(
-                  team.shortName ?? team.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+      data: (teams) => _TeamsWithSearch(teams: teams),
     );
   }
 }
 
-// ── Бомбардиры ───────────────────────────────────────────────────────────────
+class _TeamsWithSearch extends StatelessWidget {
+  final List<Team> teams;
+  const _TeamsWithSearch({required this.teams});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+          child: SearchBarOverlay<Team>(
+            items: teams,
+            hint: 'Найти команду...',
+            searchLabel: (t) => '${t.name} ${t.shortName ?? ''}',
+            itemsBuilder: (team) => _TeamDropdownItem(team: team),
+          ),
+        ),
+        // Грид команд
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: teams.length,
+            itemBuilder: (context, index) {
+              final team = teams[index];
+              return GestureDetector(
+                onTap: () => context.push(
+                  '/team/${team.id}?name=${Uri.encodeComponent(team.name)}',
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (team.crest != null)
+                      CachedNetworkImage(
+                        imageUrl: team.crest!,
+                        width: 56,
+                        height: 56,
+                        errorWidget: (_, __, ___) =>
+                            const Icon(Icons.shield, size: 56),
+                      )
+                    else
+                      const Icon(Icons.shield, size: 56),
+                    const SizedBox(height: 6),
+                    Text(
+                      team.shortName ?? team.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TeamDropdownItem extends StatelessWidget {
+  final Team team;
+  const _TeamDropdownItem({required this.team});
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (ctx) => ListTile(
+        dense: true,
+        leading: team.crest != null
+            ? CachedNetworkImage(
+                imageUrl: team.crest!,
+                width: 32,
+                height: 32,
+                errorWidget: (_, __, ___) => const Icon(Icons.shield, size: 32),
+              )
+            : const Icon(Icons.shield, size: 32),
+        title: Text(team.name, style: const TextStyle(fontSize: 14)),
+        subtitle: team.shortName != null
+            ? Text(team.shortName!, style: const TextStyle(fontSize: 12))
+            : null,
+        onTap: () => context.push(
+          '/team/${team.id}?name=${Uri.encodeComponent(team.name)}',
+        ),
+      ),
+    );
+  }
+}
 
 class _ScorersTab extends ConsumerWidget {
   final String code;
@@ -276,7 +372,10 @@ class _ScorersTab extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${s.goals ?? 0}',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),

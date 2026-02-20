@@ -13,13 +13,13 @@ class BottomNavShell extends ConsumerWidget {
     final currentTheme = ref.watch(themeModeProvider);
     return currentTheme == ThemeMode.dark ||
         (currentTheme == ThemeMode.system &&
-        MediaQuery.of(context).platformBrightness == Brightness.dark);
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
   }
 
-  void _toogleTheme(WidgetRef ref, bool isDark) {
-    ref.read(themeModeProvider.notifier).setTheme(
-      isDark ? ThemeMode.light : ThemeMode.dark,
-    );
+  void _toggleTheme(WidgetRef ref, bool isDark) {
+    ref
+        .read(themeModeProvider.notifier)
+        .setTheme(isDark ? ThemeMode.light : ThemeMode.dark);
   }
 
   int _selectedIndex(BuildContext context) {
@@ -60,8 +60,8 @@ class BottomNavShell extends ConsumerWidget {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () => _toogleTheme(ref, isDark),
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () => _toggleTheme(ref, isDark),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
