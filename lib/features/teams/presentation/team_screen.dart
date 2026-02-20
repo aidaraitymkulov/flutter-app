@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/teams/domain/team.dart';
+import 'package:flutter_app/shared/widgets/search_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +22,10 @@ class TeamScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(teamName),
           bottom: const TabBar(
-            tabs: [Tab(text: 'Состав'), Tab(text: 'Матчи')],
+            tabs: [
+              Tab(text: 'Состав'),
+              Tab(text: 'Матчи'),
+            ],
           ),
         ),
         body: teamAsync.when(
@@ -28,58 +33,101 @@ class TeamScreen extends ConsumerWidget {
           error: (e, _) => Center(child: Text('Ошибка: $e')),
           data: (team) => TabBarView(
             children: [
-              // Вкладка: состав
-              CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          if (team.crest != null)
-                            CachedNetworkImage(
-                              imageUrl: team.crest!,
-                              width: 80,
-                              height: 80,
-                            ),
-                          const SizedBox(height: 12),
-                          if (team.venue != null)
-                            Text(team.venue!, style: const TextStyle(fontSize: 14)),
-                          if (team.founded != null)
-                            Text('Основан: ${team.founded}'),
-                          if (team.clubColors != null)
-                            Text('Цвета: ${team.clubColors}'),
-                          if (team.coach != null)
-                            Text('Тренер: ${team.coach!.name ?? '—'}'),
-                          const Divider(height: 24),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final player = team.squad[index];
-                        return ListTile(
-                          title: Text(player.name),
-                          subtitle: Text(player.position ?? '—'),
-                          trailing: Text(player.nationality ?? ''),
-                          onTap: () => context.push(
-                            '/player/${player.id}?name=${Uri.encodeComponent(player.name)}',
-                          ),
-                        );
-                      },
-                      childCount: team.squad.length,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Вкладка: матчи
+              _SquadTab(team: team),
               _TeamMatchesTab(teamId: teamId),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SquadTab extends StatelessWidget {
+  final Team team;
+  const _SquadTab({required this.team});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                if (team.crest != null)
+                  CachedNetworkImage(
+                    imageUrl: team.crest!,
+                    width: 80,
+                    height: 80,
+                  ),
+                const SizedBox(height: 12),
+                if (team.venue != null)
+                  Text(team.venue!, style: const TextStyle(fontSize: 14)),
+                if (team.founded != null) Text('Основан: ${team.founded}'),
+                if (team.clubColors != null) Text('Цвета: ${team.clubColors}'),
+                if (team.coach != null)
+                  Text('Тренер: ${team.coach!.name ?? '—'}'),
+                const Divider(height: 24),
+                if (team.squad.isNotEmpty)
+                  SearchBarOverlay<Player>(
+                    items: team.squad,
+                    hint: 'Найти игрока...',
+                    searchLabel: (p) =>
+                        '${p.name} ${p.nationality ?? ''} ${p.position ?? ''}',
+                    itemsBuilder: (player) =>
+                        _PlayerDropdownItem(player: player),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        // Список игроков
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final player = team.squad[index];
+            return ListTile(
+              title: Text(player.name),
+              subtitle: Text(player.position ?? '—'),
+              trailing: Text(player.nationality ?? ''),
+              onTap: () => context.push(
+                '/player/${player.id}?name=${Uri.encodeComponent(player.name)}',
+              ),
+            );
+          }, childCount: team.squad.length),
+        ),
+      ],
+    );
+  }
+}
+
+/// Один элемент в выпадашке поиска игроков
+class _PlayerDropdownItem extends StatelessWidget {
+  final Player player;
+  const _PlayerDropdownItem({required this.player});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      leading: CircleAvatar(
+        radius: 16,
+        child: Text(
+          player.name.isNotEmpty ? player.name[0] : '?',
+          style: const TextStyle(fontSize: 12),
+        ),
+      ),
+      title: Text(player.name, style: const TextStyle(fontSize: 14)),
+      subtitle: Text(
+        [
+          player.position,
+          player.nationality,
+        ].where((s) => s != null && s.isNotEmpty).join(' · '),
+        style: const TextStyle(fontSize: 12),
+      ),
+      onTap: () => context.push(
+        '/player/${player.id}?name=${Uri.encodeComponent(player.name)}',
       ),
     );
   }
@@ -129,7 +177,9 @@ class _TeamMatchesTab extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    Expanded(child: Text(m.awayTeam.shortName ?? m.awayTeam.name)),
+                    Expanded(
+                      child: Text(m.awayTeam.shortName ?? m.awayTeam.name),
+                    ),
                   ],
                 ),
               ),
