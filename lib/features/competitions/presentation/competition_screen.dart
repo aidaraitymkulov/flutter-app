@@ -181,6 +181,19 @@ class _MatchesTab extends ConsumerWidget {
   final String code;
   const _MatchesTab({required this.code});
 
+  String _formatDate(String utcDate) {
+    try {
+      final dt = DateTime.parse(utcDate).toLocal();
+      final day = dt.day.toString().padLeft(2, '0');
+      final month = dt.month.toString().padLeft(2, '0');
+      final hour = dt.hour.toString().padLeft(2, '0');
+      final minute = dt.minute.toString().padLeft(2, '0');
+      return '$day.$month  $hour:$minute';
+    } catch (_) {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final matchesAsync = ref.watch(competitionMatchesProvider(code));
@@ -202,27 +215,42 @@ class _MatchesTab extends ConsumerWidget {
             child: InkWell(
               onTap: () => context.push('/match/${m.id}'),
               child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Text(
-                        m.homeTeam.shortName ?? m.homeTeam.name,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        isFinished ? '$home : $away' : 'vs',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            m.homeTeam.shortName ?? m.homeTeam.name,
+                            textAlign: TextAlign.end,
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            isFinished ? '$home : $away' : 'vs',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(m.awayTeam.shortName ?? m.awayTeam.name),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text(m.awayTeam.shortName ?? m.awayTeam.name),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDate(m.utcDate),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
+                      ),
                     ),
                   ],
                 ),
@@ -323,24 +351,22 @@ class _TeamDropdownItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (ctx) => ListTile(
-        dense: true,
-        leading: team.crest != null
-            ? CachedNetworkImage(
-                imageUrl: team.crest!,
-                width: 32,
-                height: 32,
-                errorWidget: (_, __, ___) => const Icon(Icons.shield, size: 32),
-              )
-            : const Icon(Icons.shield, size: 32),
-        title: Text(team.name, style: const TextStyle(fontSize: 14)),
-        subtitle: team.shortName != null
-            ? Text(team.shortName!, style: const TextStyle(fontSize: 12))
-            : null,
-        onTap: () => context.push(
-          '/team/${team.id}?name=${Uri.encodeComponent(team.name)}',
-        ),
+    return ListTile(
+      dense: true,
+      leading: team.crest != null
+          ? CachedNetworkImage(
+              imageUrl: team.crest!,
+              width: 32,
+              height: 32,
+              errorWidget: (_, __, ___) => const Icon(Icons.shield, size: 32),
+            )
+          : const Icon(Icons.shield, size: 32),
+      title: Text(team.name, style: const TextStyle(fontSize: 14)),
+      subtitle: team.shortName != null
+          ? Text(team.shortName!, style: const TextStyle(fontSize: 12))
+          : null,
+      onTap: () => context.push(
+        '/team/${team.id}?name=${Uri.encodeComponent(team.name)}',
       ),
     );
   }

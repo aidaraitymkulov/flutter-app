@@ -180,8 +180,12 @@ class _SearchDropdown<T> extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     shrinkWrap: true,
                     itemCount: results.length,
-                    itemBuilder: (context, index) =>
-                        itemBuilder(results[index]),
+                    itemBuilder: (context, index) => Listener(
+                      behavior: HitTestBehavior.translucent,
+                      onPointerDown: (_) => WidgetsBinding.instance
+                          .addPostFrameCallback((_) => onDismiss()),
+                      child: itemBuilder(results[index]),
+                    ),
                   ),
                 ),
               ),

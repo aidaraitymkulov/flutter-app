@@ -17,7 +17,10 @@ class CompetitionsRepository {
     return list.map((e) => Competition.fromJson(e)).toList();
   }
 
-  Future<List<StandingRow>> getStandings(String code, {String type = 'TOTAL'}) async {
+  Future<List<StandingRow>> getStandings(
+    String code, {
+    String type = 'TOTAL',
+  }) async {
     final response = await _api.get(Endpoints.standings(code));
     final standings = response.data['standings'] as List;
     final table = standings.firstWhere(
@@ -41,6 +44,7 @@ class CompetitionsRepository {
       },
     );
     final list = response.data['matches'] as List;
+    print(list);
     return list.map((e) => FootballMatch.fromJson(e)).toList();
   }
 
